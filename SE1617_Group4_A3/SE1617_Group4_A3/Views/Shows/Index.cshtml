@@ -1,0 +1,118 @@
+﻿@model SE1617_Group4_A3.Models.Show
+
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor;
+
+@{
+    ViewData["Title"] = "Index";
+}
+@{string user = HttpContextAccessor.HttpContext.Session.GetString("username") ?? "";}
+
+<h1>Search Shows</h1>
+<form asp-action="Index" style="width: 50%; margin-bottom: 2%;">
+    <div class="form-group">
+        <label class="control-label" asp-for="RoomId"></label><br />
+        <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId" id="room" onchange="roomChanged(this)"></select>
+    </div>
+    <div class="form-group">
+        <label class="control-label" asp-for="ShowDate"></label><br />
+        <input type="date" class="form-control" asp-for="ShowDate" />
+    </div>
+    <div class="form-group">
+        <label class="control-label" asp-for="FilmId"></label><br />
+        <select asp-for="FilmId" class="form-control" asp-items="ViewBag.FilmId"></select>
+    </div>
+    <input class="btn btn-primary" type="submit" value="Search" />
+</form>
+@if (user != "")
+{
+    <p>
+        <a asp-action="Create" asp-route-id="@Model.RoomId" id="create-new">Create New</a>
+    </p>
+}
+@{int count = (ViewBag.shows as List<Show>).Count; }
+<h4>The number of shows: @count</h4>
+@{
+    if (TempData["message"] != null)
+    {
+        <div id="success-alert" class="alert alert-success alert-dismissible fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Success!</strong> @TempData["message"]
+        </div>
+    }
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ShowDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            @*<th>
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>*@
+            <th>
+                @Html.DisplayNameFor(model => model.Slot)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Film)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Room)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Show item in ViewBag.shows)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ShowDate, new { @class = "formContrl" })
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                @*<td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>*@
+                <td>
+                    @Html.DisplayFor(modelItem => item.Slot)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Film.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Room.Name)
+                </td>
+                <td>
+                    @if (user != "")
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.ShowId">Edit |</a>
+                    }
+
+                    <a asp-action="Details" asp-route-id="@item.ShowId">Details |</a>
+                    @if (user != "")
+                    {
+                        <a class="delete" asp-action="Delete" asp-route-id="@item.ShowId">Delete |</a>
+                    }
+                    <a asp-action="Index" asp-controller="Bookings" asp-route-id="@item.ShowId">Booking</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <script>
+
+        $("#success-alert").fadeTo(2000, 500).slideUp(500, function () {
+            $("#success-alert").slideUp(500);
+        });
+        function roomChanged(obj) {
+            var value = obj.value;
+            $("#create-new").attr('href', "/Shows/Create/" + value);
+        }
+    </script>
+}

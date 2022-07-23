@@ -1,0 +1,83 @@
+﻿@model SE1617_Group4_A3.Models.Booking
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit Booking</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" asp-controller="Bookings" method="post">
+            <div id="box-seats">
+                @{
+                    char[] currentSeats = (ViewBag.currentBooking as string).ToCharArray();
+                    int count = 0;
+                    for (int i = 0; i < (ViewBag.Room as Room).NumberRows; i++)
+                    {
+                        for (int j = 0; j < (ViewBag.Room as Room).NumberCols; j++)
+                        {
+                            foreach (char[] item in ViewBag.listBooked as List<char[]>)
+                            {
+                                if (item[count] == '1')
+                                {
+                                    <input class="seats" type="checkbox" name="seats" value="@(count)" checked disabled />
+                                }
+                                else if (currentSeats[count] == '1')
+                                {
+                                    <input class="seats" type="checkbox" name="seats" value="@(count)" checked />
+                                }
+                                else
+                                {
+                                    <input class="seats" type="checkbox" name="seats" value="@(count)" />
+                                }
+                            }
+                            count++;
+                        }
+                        <br />
+                    }
+                }
+            </div>
+            <br />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="BookingId" />
+            <input type="hidden" asp-for="ShowId" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Amount" class="control-label"></label>
+                <input id="total" asp-for="Amount" class="form-control" readonly />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" asp-route-id="@Model.ShowId">Back to List</a>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $('.seats').on('change', function () {
+            var sumPrice = 0;
+            var count = 0;
+            $('.seats:checked').each(function (index, item) {
+                if (!$(item).attr("disabled")) {
+                    count++;
+                }
+            });
+            sumPrice = count * @ViewBag.Price;
+            $('#total').attr("value", sumPrice);
+        });
+    </script>
+}
+

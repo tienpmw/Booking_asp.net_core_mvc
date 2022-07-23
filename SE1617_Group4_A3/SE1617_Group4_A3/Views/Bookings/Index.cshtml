@@ -1,0 +1,93 @@
+﻿@model SE1617_Group4_A3.Models.Booking
+
+@{
+    ViewData["Title"] = "Booking";
+}
+<h1>Booking</h1>
+
+
+<div id="box-seats">
+    @{
+        int count = 0;
+        for (int i = 0; i < (ViewBag.Room as Room).NumberRows; i++)
+        {
+            for (int j = 0; j < (ViewBag.Room as Room).NumberCols; j++)
+            {
+                foreach (char[] item in (ViewBag.listBooked as List<char[]>))
+                {
+                    if (item[count] == '1')
+                    {
+                        <input type="checkbox" value="@(count)" checked disabled />
+                    }
+                    else
+                    {
+                        <input type="checkbox" value="@(count)" disabled />
+                    }
+                }
+                count++;
+            }
+            <br />
+        }
+    }
+</div>
+@Html.ActionLink("Create New Booking", "Create", "Bookings", new { id = @Model.BookingId })
+<h4>The number of booking: @((ViewBag.listBooking as List<Booking>).Count)</h4>
+@{
+    if (TempData["message"] != null)
+    {
+        <div id="success-alert" class="alert alert-success alert-dismissible fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Success!</strong> @TempData["message"]
+        </div>
+    }
+}
+@if ((ViewBag.listBooking as List<Booking>).Count != 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                @*<th>
+                    @Html.DisplayNameFor(model => model.SeatStatus)
+                </th>*@
+                <th>
+                    @Html.DisplayNameFor(model => model.Amount)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Booking item in (ViewBag.listBooking as List<Booking>))
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                @*<td width="50%">
+                    @Html.DisplayFor(modelItem => item.SeatStatus)
+                </td>*@
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", "Bookings", new { idBooking = item.BookingId, idShow = @Model.BookingId }) |
+                    @Html.ActionLink("Details", "Details", "Bookings", new { idBooking = item.BookingId, idShow = @Model.BookingId }) |
+                    @Html.ActionLink("Delete", "Delete", "Bookings", new { idBooking = item.BookingId, idShow = @Model.BookingId }, new { @class = "delete" })
+                </td>
+            </tr>
+            }
+
+        </tbody>
+    </table>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $("#success-alert").fadeTo(2000, 500).slideUp(500, function () {
+            $("#success-alert").slideUp(500);
+        });
+    </script>
+}
